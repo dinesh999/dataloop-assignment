@@ -29,7 +29,7 @@ filters = dl.Filters()
 filters.add(field='name', values='*.jpg')
 pages = dataset.items.list(filters=filters)
 print('Number of filtered items in dataset: {}'.format(pages.items_count))
-rsp = dataset.items.update(None, filters, {"collectedUTM":str(datetime.now())}, None, True)
+rsp = dataset.items.update(None, filters, {"collectedUTM":str(datetime.now())}, None, False)
 # print(rsp)
 
 
