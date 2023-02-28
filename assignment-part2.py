@@ -84,7 +84,7 @@ for page in pages:
     for item in page:
         print("item id: " + item.id)
         print("item name: " + item.name)
-        annotations = annotations = item.annotations.list(filters=dl.Filters(
+        annotations = item.annotations.list(filters=dl.Filters(
                              resource=dl.FiltersResource.ANNOTATION,
                              field='type',
                              values='point'),
