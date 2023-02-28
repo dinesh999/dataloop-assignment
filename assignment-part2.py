@@ -24,17 +24,19 @@ dataset.items.upload(local_path=r'C:\Users\Lenovo\Downloads\car-images-dataloop\
                      remote_path='/dog-folder')
 
 
-#get items and modify
-pages = dataset.items.list()
-# Count the items
-print('Number of items in dataset: {}'.format(pages.items_count))
-# Go over all item and print the properties
+# update the utm to items
+filters = dl.Filters()
+filters.add(field='name', values='*.jpg')
+pages = dataset.items.list(filters=filters)
+print('Number of filtered items in dataset: {}'.format(pages.items_count))
+rsp = dataset.items.update(None, filters, {"collectedUTM":str(datetime.now())}, None, True)
+# print(rsp)
+
+
+# add annotations
+
 for page in pages:
     for item in page:
-        item.metadata['user'] = dict()
-        item.metadata['user']['collected'] = str(datetime.now())
-        print(item.metadata)
-        dataset.items.update(item)
         if item.metadata['system']['originalname'] == '1.jpg' or \
                 item.metadata['system']['originalname'] == '2.jpg':
             builder = item.annotations.builder()
@@ -71,21 +73,27 @@ for page in pages:
         print(item.id)
 
 # filter for point annotation
-filters = dl.Filters(resource=dl.FiltersResource.ANNOTATION, field='type', values='point')
+filters = dl.Filters(resource=dl.FiltersResource.ITEM)
 # Get filtered item list in a page object
+filters.add_join(field='label', values='key')
 pages = dataset.items.list(filters)
 # Count the items
 print('Number of filtered items in dataset: {}'.format(pages.items_count))
 # Iterate through the items - go over all items and print the properties
 for page in pages:
-    for annotation in page:
-        print(annotation)
-        print(annotation.id)
-        print(annotation.item_id)
-        print(annotation.label)
-        print(dataset.items.get(item_id=annotation.item_id).name)
-        print(dataset.items.get(item_id=annotation.item_id))
-        # print(annotation.from_coordinates())
+    for item in page:
+        print("item id: " + item.id)
+        print("item name: " + item.name)
+        annotations = annotations = item.annotations.list(filters=dl.Filters(
+                             resource=dl.FiltersResource.ANNOTATION,
+                             field='type',
+                             values='point'),
+          page_size=100,
+          page_offset=0)
+        for anObj in annotations:
+            print("Annotation id:" + anObj.id)
+            print("Annotation type:" + anObj.type)
+            print("Annotation point " + anObj.to_json()['coordinates'])
 
 
 
